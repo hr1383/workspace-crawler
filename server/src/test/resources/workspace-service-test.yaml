@@ -1,0 +1,58 @@
+server:
+  type: default
+  maxThreads: 1024
+  maxQueuedRequests: 2048
+  idleThreadTimeout: 60s
+
+  applicationConnectors:
+    - type: http
+      port: 9460
+
+  adminConnectors:
+    - type: http
+      port: 9461
+
+logging:
+  level: INFO
+  loggers:
+    "com.work.space":
+      level: INFO
+      additive: true
+      appenders:
+        - type: file
+          threshold: DEBUG
+          currentLogFilename: "./workspace-crawler.log"
+          archive: true
+          archivedLogFilenamePattern: "./workspace-crawler-%d.log.gz"
+          archivedFileCount: 10
+          logFormat: "%level [%d{ISO8601}] [%thread] %logger{32}: %m%n"
+    "org.eclipse.jetty":
+      level: INFO
+    "org.reflections":
+      level: INFO
+
+  appenders:
+    - type: file
+      threshold: ALL
+      currentLogFilename: "/all.log"
+      archive: true
+      archivedLogFilenamePattern: "/all-%d.log.gz"
+      archivedFileCount: 5
+      logFormat: "%level [%d{ISO8601}] [%thread] %logger{32}: %m%n"
+
+httpConfig:
+  connectionTtlMs: 30000
+  pooledConnectionIdleTimeoutMs: 3000
+  readTimeoutMs: 5000
+  requestTimeoutMs: 5000
+  connectTimeoutMs: 5000
+  socketTimeoutMs: 20000
+  maxRetry: 7
+  corePoolSize: 20
+  maxConnTotal: 20
+  maxConnectionsPerRoute: 20
+
+elasticSearch:
+  maxConnTotal: 50
+  connectionTtlMs: 30000
+  url: http://localhost:29200
