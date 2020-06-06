@@ -1,6 +1,7 @@
 package com.work.space.crawler.resources
 
 import com.work.space.crawler.configuration.ServiceResponse
+import com.work.space.crawler.services.BasicWebCrawlerService
 import javax.ws.rs._
 import javax.ws.rs.core.MediaType
 import org.slf4j.{Logger, LoggerFactory}
@@ -12,28 +13,19 @@ object WorkSpaceResource {
 @Path("/v1")
 class WorkSpaceResource() {
 
+  val basicWebCrawlerService: BasicWebCrawlerService = new BasicWebCrawlerService()
+
   @POST
-  @Path("/submit/app/{appId}")
+  @Path("/crawl/images")
   @Consumes(Array(MediaType.APPLICATION_JSON))
   @Produces(Array(MediaType.APPLICATION_JSON))
-  def submitJob(@PathParam("appId") appId: String): ServiceResponse = {
+  def crawlImages(url: String): ServiceResponse = {
 
+    val imageMetaInfo = basicWebCrawlerService.pageLink(url)
+    val allImages = imageMetaInfo.map(_.src).mkString(",")
     ServiceResponse(
       statusCode = 200,
-      message = Some(
-        s"Success. appId=$appId"
-      )
-    )
-  }
-
-  @GET
-  @Path("/cluster/status")
-  @Consumes(Array(MediaType.APPLICATION_JSON))
-  @Produces(Array(MediaType.APPLICATION_JSON))
-  def clusterStatus(): ServiceResponse = {
-    ServiceResponse(
-      statusCode = 200,
-      message = Some("OK")
+      message = Some(allImages)
     )
   }
 

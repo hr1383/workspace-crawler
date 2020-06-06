@@ -5,9 +5,10 @@ import java.io.File
 import com.datasift.dropwizard.scala.ScalaApplication
 import com.datasift.dropwizard.scala.test.{ApplicationTest, BeforeAndAfterAllMulti}
 import com.google.common.io.Resources
-import com.work.space.crawler.configuration.WorkSpaceCrawlerConfiguration
+import com.work.space.crawler.configuration.{ServiceResponse, WorkSpaceCrawlerConfiguration}
 import io.dropwizard.setup.Environment
-import javax.ws.rs.client.{Client, WebTarget}
+import javax.ws.rs.client.{Client, Entity, WebTarget}
+import javax.ws.rs.core.{MediaType, Response}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.Try
@@ -43,29 +44,17 @@ class WorkSpaceResourceSpecIT extends FlatSpec with BeforeAndAfterAllMulti with 
     server <- app.server
   } yield { client.target(server.getURI.resolve(target)) }
 
-//  "POST /v1/cluster/status" should " get the cluster status from Spark Master" in {
-//    val result: Try[Response] = request("/v1/cluster/status/").map {
-//      _.request(MediaType.APPLICATION_JSON)
-//        .accept(MediaType.APPLICATION_JSON)
-//        .post(Entity.json(appConfig.runtimeConfig))
-//    }
-//
-//    val resp = result.map { r => r.readEntity[ServiceResponse](classOf[ServiceResponse]) }
-//    resp.get.message.isDefined shouldBe true
-//    resp.get.message.get shouldEqual "OK"
-//  }
+  "POST /v1/cluster/status" should " get the cluster status from Spark Master" in {
+    val result: Try[Response] = request("/v1/crawl/images/").map {
+      _.request(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .post(Entity.json("http://www.zoomify.com/"))
+    }
 
-//  "POST /v1/submit/app/app123" should " insert app using provided appId" in {
-//    val result: Try[Response] = request("/v1/submit/app/app123").map {
-//      _.request(MediaType.APPLICATION_JSON)
-//        .accept(MediaType.APPLICATION_JSON)
-//        .post(Entity.json[AppConfig](appConfig))
-//    }
-//
-//    val resp = result.map { r => r.readEntity[ServiceResponse](classOf[ServiceResponse]) }
-//    resp.get.message.isDefined shouldBe true
-//    resp.get.message.get shouldEqual "Success. post.uuid=app123 appId=app123"
-//  }
+    val resp = result.map { r => r.readEntity[ServiceResponse](classOf[ServiceResponse]) }
+    resp.get.message.isDefined shouldBe true
+    resp.get.message.get shouldEqual "List()"
+  }
 
 
 }
