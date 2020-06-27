@@ -13,8 +13,9 @@
     <packaging>jar</packaging>
 
     <properties>
-        <scalatest.version>3.0.3</scalatest.version>
+        <scalatest.version>3.2.0</scalatest.version>
         <apache-httpasync.version>4.1.4</apache-httpasync.version>
+        <quill.version>3.5.2</quill.version>
     </properties>
 
     <dependencies>
@@ -46,12 +47,44 @@
 
         <!-- Dropwizard 13 Imports END -->
 
+        <!-- Quill -->
+        <dependency>
+            <groupId>io.getquill</groupId>
+            <artifactId>quill-jdbc_${scala.version}</artifactId>
+            <version>${quill.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.getquill</groupId>
+            <artifactId>quill-core_${scala.version}</artifactId>
+            <version>${quill.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.getquill</groupId>
+            <artifactId>quill-sql_${scala.version}</artifactId>
+            <version>${quill.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.14</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.196</version>
+        </dependency>
 
         <dependency>
-            <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_${scala.version}</artifactId>
-            <version>${scalatest.version}</version>
+            <groupId>com.opentable.components</groupId>
+            <artifactId>otj-pg-embedded</artifactId>
+            <version>0.13.3</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>6.5.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.datasift.dropwizard.scala/dropwizard-scala-test -->
