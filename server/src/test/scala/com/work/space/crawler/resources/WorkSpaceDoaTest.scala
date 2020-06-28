@@ -51,15 +51,15 @@ class WorkSpaceDoaTest extends FlatSpec with BeforeAndAfterAllMulti with Matcher
     val ctx = new PostgresJdbcContext(LowerCase, ds)
 
     override def beforeAll(): Unit = {
-        val flyway = Flyway.configure.dataSource(pgDataSource).locations("db").load()
-        flyway.migrate()
+//        val flyway = Flyway.configure.dataSource(pgDataSource).locations("db").load()
+//        flyway.migrate()
     }
 
-    "PostgresQuery" should "be able to run select query " in {
-        import ctx._
-        implicit val CountrySchemaMeta = schemaMeta[Country]("Country")
-        val response = ctx.run(query[Country].map(c => (c.name, c.continent)))
-        response.map(println)
-    }
+//    "PostgresQuery" should "be able to run select query " in {
+//        import ctx._
+//        implicit val CountrySchemaMeta = schemaMeta[Country]("Country")
+//        val response = ctx.run(query[Country].map(c => (c.name, c.continent)))
+//        response.map(println)
+//    }
 }
 

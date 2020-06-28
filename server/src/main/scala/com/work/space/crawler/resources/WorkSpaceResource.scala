@@ -15,18 +15,18 @@ class WorkSpaceResource() {
 
   val basicWebCrawlerService: BasicWebCrawlerService = new BasicWebCrawlerService()
 
-  @POST
-  @Path("/crawl/images")
-  @Consumes(Array(MediaType.APPLICATION_JSON))
-  @Produces(Array(MediaType.APPLICATION_JSON))
-  def crawlImages(url: String): ServiceResponse = {
-
-    val imageMetaInfo = basicWebCrawlerService.pageLink(url)
-    val allImages = imageMetaInfo.map(_.src).mkString(",")
-    ServiceResponse(
-      statusCode = 200,
-      message = Some(allImages)
-    )
-  }
+//  @POST
+//  @Path("/crawl/images")
+//  @Consumes(Array(MediaType.APPLICATION_JSON))
+//  @Produces(Array(MediaType.APPLICATION_JSON))
+//  def crawlImages(url: String): ServiceResponse[String] = {
+//
+//    val imageMetaInfo = basicWebCrawlerService.pageLink(url)
+//    val allImages = imageMetaInfo.map(_.src).mkString(",")
+//    ServiceResponse[String](
+//      statusCode = 200,
+//      message = Some(allImages)
+//    )
+//  }
 
 }

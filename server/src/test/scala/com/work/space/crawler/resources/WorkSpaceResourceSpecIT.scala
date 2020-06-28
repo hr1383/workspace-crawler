@@ -44,17 +44,17 @@ class WorkSpaceResourceSpecIT extends FlatSpec with BeforeAndAfterAllMulti with 
     server <- app.server
   } yield { client.target(server.getURI.resolve(target)) }
 
-  "POST /v1/cluster/status" should " get the cluster status from Spark Master" in {
-    val result: Try[Response] = request("/v1/crawl/images/").map {
-      _.request(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON)
-        .post(Entity.json("http://www.zoomify.com/"))
-    }
-
-    val resp = result.map { r => r.readEntity[ServiceResponse](classOf[ServiceResponse]) }
-    resp.get.message.isDefined shouldBe true
-    resp.get.message.get shouldEqual "List()"
-  }
+//  "POST /v1/cluster/status" should " get the cluster status from Spark Master" in {
+//    val result: Try[Response] = request("/v1/crawl/images/").map {
+//      _.request(MediaType.APPLICATION_JSON)
+//        .accept(MediaType.APPLICATION_JSON)
+//        .post(Entity.json("http://www.zoomify.com/"))
+//    }
+//
+//    val resp = result.map { r => r.readEntity[ServiceResponse](classOf[ServiceResponse]) }
+//    resp.get.message.isDefined shouldBe true
+//    resp.get.message.get shouldEqual "List()"
+//  }
 
 
 }
