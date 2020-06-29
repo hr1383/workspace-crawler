@@ -1,8 +1,11 @@
 package com.vicaya.app.resources
 
+import java.util.concurrent.TimeUnit
+
 import com.vicaya.app.response.Document
-import javax.ws.rs.{GET, Path, Produces}
-import com.vicaya.connectors.{ConnectorService}
+import javax.ws.rs.{GET, Path, Produces, QueryParam}
+import com.vicaya.connectors.ConnectorService
+import javax.ws.rs.container.{AsyncResponse, Suspended}
 import javax.ws.rs.core.MediaType
 
 object ServiceResource {
@@ -15,7 +18,9 @@ class ServiceResource(connectorService: ConnectorService) {
 
   @GET
   @Produces(Array(MediaType.APPLICATION_JSON))
-  def search(text: String): Seq[Document] = {
-    connectorService.search(text)
+  def search(@QueryParam("text") text: String,
+             @Suspended asyncResponse: AsyncResponse): Unit = {
+    asyncResponse.setTimeout(30, TimeUnit.SECONDS)
+    asyncResponse.resume(connectorService.search(text))
   }
 }
