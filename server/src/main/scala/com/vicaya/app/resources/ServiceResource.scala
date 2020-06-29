@@ -1,6 +1,6 @@
-package com.vicaya.resources
+package com.vicaya.app.resources
 
-import com.vicaya.response.Document
+import com.vicaya.app.response.Document
 import javax.ws.rs.{GET, Path, Produces}
 import com.vicaya.connectors.{ConnectorService}
 import javax.ws.rs.core.MediaType

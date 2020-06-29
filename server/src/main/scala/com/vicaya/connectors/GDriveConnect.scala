@@ -11,7 +11,7 @@ import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.client.util.store.FileDataStoreFactory
 import com.google.api.services.drive.{Drive, DriveScopes}
-import com.vicaya.response.Document
+import com.vicaya.app.response.Document
 
 
 object GDriveConnect {
@@ -52,10 +52,10 @@ object GDriveConnect {
     service
   }
 
-  def main(args: Array[String]): Unit = {
-    val driveConnect = new GDriveConnect()
-    driveConnect.searchContent("curl")
-  }
+//  def main(args: Array[String]): Unit = {
+//    val driveConnect = new GDriveConnect()
+//    driveConnect.searchContent("curl")
+//  }
 }
 
 class GDriveConnect {

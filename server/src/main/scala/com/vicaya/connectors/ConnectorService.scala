@@ -1,6 +1,6 @@
 package com.vicaya.connectors
 
-import com.vicaya.response.Document
+import com.vicaya.app.response.Document
 
 
 object ConnectorService {
