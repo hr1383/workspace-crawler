@@ -3,8 +3,10 @@ package com.vicaya.app.service
 import com.datasift.dropwizard.scala.ScalaApplication
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import com.vicaya.app.configuration.{DatabaseConfig, WorkSpaceCrawlerConfiguration}
+import com.vicaya.connectors.{ConnectorService, GDriveConnect}
 import com.vicaya.database.dao.service.BaseDaoService
 import com.vicaya.database.rest.service.UserResource
+import com.vicaya.resources.ServiceResource
 import io.dropwizard.setup.{Bootstrap, Environment}
 import org.slf4j.{Logger, LoggerFactory}
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
@@ -44,20 +46,21 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
         config.setDataSource(pgDataSource)
 
         // Create a datasource
-        val ds = new HikariDataSource(config)
-        val ctx = new PostgresJdbcContext[SnakeCase](SnakeCase, ds) with ImplicitQuery
-
-        // Init Database
-        Try(ds.getConnection) match  {
-            case Success(_) =>
-                logger.info(s"Successfully connected to Postgres ${ds.getJdbcUrl}")
-
-            case Failure(exception) =>
-                logger.info(s"Failed to connected to Postgres ${ds.getJdbcUrl}", exception)
-        }
+//        val ds = new HikariDataSource(config)
+//        val ctx = new PostgresJdbcContext[SnakeCase](SnakeCase, ds) with ImplicitQuery
+//
+//        // Init Database
+//        Try(ds.getConnection) match  {
+//            case Success(_) =>
+//                logger.info(s"Successfully connected to Postgres ${ds.getJdbcUrl}")
+//
+//            case Failure(exception) =>
+//                logger.info(s"Failed to connected to Postgres ${ds.getJdbcUrl}", exception)
+//        }
         // Init resource class
         //env.jersey().register(new WorkSpaceResource())
-        env.jersey().register(new UserResource(new BaseDaoService(ctx)))
+//        env.jersey().register(new UserResource(new BaseDaoService(ctx)))
+        env.jersey().register(new ServiceResource(new ConnectorService(new GDriveConnect)))
     }
 
     def startEmbeddedDatabase(): EmbeddedPostgres = {
