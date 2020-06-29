@@ -1,11 +1,10 @@
-package com.work.space.crawler
+package com.vicaya.app.service
 
 import com.datasift.dropwizard.scala.ScalaApplication
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
-import com.vicaya.dao.service.BaseDaoService
-import com.vicaya.rest.service.UserResource
-import com.work.space.crawler.configuration.{DatabaseConfig, WorkSpaceCrawlerConfiguration}
-import com.work.space.crawler.resources.WorkSpaceResource
+import com.vicaya.app.configuration.{DatabaseConfig, WorkSpaceCrawlerConfiguration}
+import com.vicaya.database.dao.service.BaseDaoService
+import com.vicaya.database.rest.service.UserResource
 import io.dropwizard.setup.{Bootstrap, Environment}
 import org.slf4j.{Logger, LoggerFactory}
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
@@ -13,7 +12,7 @@ import io.getquill.{ImplicitQuery, PostgresJdbcContext, SnakeCase}
 
 import scala.util.{Failure, Success, Try}
 
-object CrawlerService extends ScalaApplication[WorkSpaceCrawlerConfiguration] {
+object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration] {
 
     val logger: Logger = LoggerFactory.getLogger("com.work.space.crawler.CrawlerService")
 

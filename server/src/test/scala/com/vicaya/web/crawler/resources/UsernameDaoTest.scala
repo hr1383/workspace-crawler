@@ -1,13 +1,12 @@
-package com.work.space.crawler.resources
+package com.vicaya.web.crawler.resources
 
 import com.datasift.dropwizard.scala.test.BeforeAndAfterAllMulti
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
-import com.vicaya.dao.service.BaseDaoService
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import io.getquill.{PostgresJdbcContext, SnakeCase}
 import org.scalatest.{FlatSpec, Matchers}
-import com.vicaya.dao.service._
-import com.vicaya.models._
+import com.vicaya.database.dao.service.{BaseDaoService, UsernameDao}
+import com.vicaya.database.models.Username
 
 class UsernameDaoTest extends FlatSpec with BeforeAndAfterAllMulti with Matchers {
 

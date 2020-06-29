@@ -1,10 +1,10 @@
-package com.vicaya.rest.service
+package com.vicaya.database.rest.service
 
 import java.util.concurrent.atomic.AtomicLong
 
-import com.vicaya.dao.service.{BaseDaoService, UsernameDao}
-import com.vicaya.models.Username
-import com.work.space.crawler.configuration.ServiceResponse
+import com.vicaya.app.configuration.ServiceResponse
+import com.vicaya.database.dao.service.{BaseDaoService, UsernameDao}
+import com.vicaya.database.models.Username
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.{Consumes, GET, POST, Path, PathParam, Produces}
 import org.slf4j.{Logger, LoggerFactory}

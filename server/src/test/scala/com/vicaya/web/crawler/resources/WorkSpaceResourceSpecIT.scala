@@ -1,14 +1,13 @@
-package com.work.space.crawler.resources
+package com.vicaya.web.crawler.resources
 
 import java.io.File
 
 import com.datasift.dropwizard.scala.ScalaApplication
 import com.datasift.dropwizard.scala.test.{ApplicationTest, BeforeAndAfterAllMulti}
 import com.google.common.io.Resources
-import com.work.space.crawler.configuration.{ServiceResponse, WorkSpaceCrawlerConfiguration}
+import com.vicaya.app.configuration.WorkSpaceCrawlerConfiguration
 import io.dropwizard.setup.Environment
 import javax.ws.rs.client.{Client, Entity, WebTarget}
-import javax.ws.rs.core.{MediaType, Response}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.Try

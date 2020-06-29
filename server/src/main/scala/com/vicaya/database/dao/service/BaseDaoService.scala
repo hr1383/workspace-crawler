@@ -1,4 +1,4 @@
-package com.vicaya.dao.service
+package com.vicaya.database.dao.service
 
 import io.getquill.{PostgresJdbcContext, SnakeCase}
 

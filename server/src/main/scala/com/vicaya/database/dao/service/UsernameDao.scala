@@ -1,6 +1,6 @@
-package com.vicaya.dao.service
+package com.vicaya.database.dao.service
 
-import com.vicaya.models.Username
+import com.vicaya.database.models.Username
 
 object UsernameDao {
     def apply(baseDaoService: BaseDaoService): UsernameDao = {

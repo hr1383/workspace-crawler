@@ -1,9 +1,7 @@
-package com.work.space.crawler.resources
+package com.vicaya.web.crawler.resources
 
-import com.work.space.crawler.configuration.ServiceResponse
-import com.work.space.crawler.services.BasicWebCrawlerService
+import com.vicaya.web.crawler.services.BasicWebCrawlerService
 import javax.ws.rs._
-import javax.ws.rs.core.MediaType
 import org.slf4j.{Logger, LoggerFactory}
 
 object WorkSpaceResource {

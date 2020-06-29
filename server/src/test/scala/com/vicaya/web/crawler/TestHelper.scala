@@ -1,4 +1,4 @@
-package com.work.space.crawler
+package com.vicaya.web.crawler
 
 import scala.io.Source
 

@@ -1,4 +1,4 @@
-package com.work.space.crawler.services
+package com.vicaya.web.crawler.services
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element

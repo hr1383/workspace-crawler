@@ -47,6 +47,8 @@
 
         <!-- Dropwizard 13 Imports END -->
 
+        <!-- Web Crawler dependencies -->
+
         <!-- Quill -->
         <dependency>
             <groupId>io.getquill</groupId>
@@ -63,16 +65,12 @@
             <artifactId>quill-sql_${scala.version}</artifactId>
             <version>${quill.version}</version>
         </dependency>
+
+        <!-- Database Dependencies -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.2.14</version>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.196</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.opentable.components</groupId>
@@ -87,11 +85,18 @@
             <version>6.5.0</version>
         </dependency>
 
+        <!-- Test Dependencies -->
         <!-- https://mvnrepository.com/artifact/com.datasift.dropwizard.scala/dropwizard-scala-test -->
         <dependency>
             <groupId>com.datasift.dropwizard.scala</groupId>
             <artifactId>dropwizard-scala-test_${scala.version}</artifactId>
             <version>${dropwizard.scala.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.196</version>
             <scope>test</scope>
         </dependency>
 

@@ -1,4 +1,4 @@
-package com.work.space.crawler.util
+package com.vicaya.web.crawler.util
 
 case object WorkSpaceCrawlerUtil {
   final val defaultEmptySeq = Seq.empty[String]

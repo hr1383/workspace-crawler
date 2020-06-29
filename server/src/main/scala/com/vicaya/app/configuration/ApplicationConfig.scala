@@ -1,4 +1,4 @@
-package com.work.space.crawler.configuration
+package com.vicaya.app.configuration
 
 import com.datasift.dropwizard.scala.validation.constraints._
 import com.fasterxml.jackson.annotation.JsonProperty

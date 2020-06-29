@@ -1,4 +1,4 @@
-package com.work.space.crawler.resources
+package com.vicaya.web.crawler.resources
 
 trait ValidParams {
 
