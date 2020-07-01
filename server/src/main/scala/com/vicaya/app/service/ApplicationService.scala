@@ -3,8 +3,10 @@ package com.vicaya.app.service
 import com.datasift.dropwizard.scala.ScalaApplication
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import com.vicaya.app.configuration.{DatabaseConfig, WorkSpaceCrawlerConfiguration}
+import com.vicaya.connectors.{ConnectorService, GDriveConnect}
 import com.vicaya.database.dao.service.BaseDaoService
 import com.vicaya.database.rest.service.UserResource
+import com.vicaya.app.resources.ServiceResource
 import io.dropwizard.setup.{Bootstrap, Environment}
 import org.slf4j.{Logger, LoggerFactory}
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
@@ -58,6 +60,7 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
         // Init resource class
         //env.jersey().register(new WorkSpaceResource())
         env.jersey().register(new UserResource(new BaseDaoService(ctx)))
+        env.jersey().register(new ServiceResource(new ConnectorService(new GDriveConnect)))
     }
 
     def startEmbeddedDatabase(): EmbeddedPostgres = {
