@@ -10,7 +10,7 @@ import com.vicaya.database.models.Username
 
 class UsernameDaoTest extends FlatSpec with BeforeAndAfterAllMulti with Matchers {
 
-    val server = EmbeddedPostgres.builder().setPort(5435).start()
+    val server = EmbeddedPostgres.builder().setPort(5432).start()
     val ctx: PostgresJdbcContext[SnakeCase] = buildPostgres
     var connection: java.sql.Connection = _
 
