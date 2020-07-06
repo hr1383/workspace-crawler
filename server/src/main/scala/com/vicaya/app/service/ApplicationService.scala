@@ -17,7 +17,7 @@ import com.google.api.client.util.store.FileDataStoreFactory
 import com.google.api.services.drive.{Drive, DriveScopes}
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import com.vicaya.app.configuration.{DatabaseConfig, WorkSpaceCrawlerConfiguration}
-import com.vicaya.connectors.{ConfluenceConnect, ConnectorService, GDriveConnect}
+import com.vicaya.connectors.{ConfluenceConnect, ConnectorService, GDriveConnect, JiraConnect}
 import com.vicaya.database.dao.service.BaseDaoService
 import com.vicaya.database.rest.service.UserResource
 import com.vicaya.app.resources.ServiceResource
@@ -44,7 +44,7 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
 
     val ctx: _root_.io.getquill.PostgresJdbcContext[_root_.io.getquill.SnakeCase] with ImplicitQuery = dbConnect(conf)
     // Init resource class
-    //env.jersey().register(new WorkSpaceResource())
+//    env.jersey().register(new WorkSpaceResource())
     val httpClient = asyncHttpClient()
     val mapper = new ObjectMapper()
     mapper.registerModule(DefaultScalaModule)
@@ -53,7 +53,8 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
     env.jersey().register(new UserResource(new BaseDaoService(ctx)))
     env.jersey().register(new ServiceResource(new ConnectorService(
       new GDriveConnect(getGService()),
-      new ConfluenceConnect(httpClient, mapper))))
+      new ConfluenceConnect(httpClient, mapper),
+      new JiraConnect(httpClient, mapper))))
   }
 
   private def dbConnect(conf: WorkSpaceCrawlerConfiguration) = {

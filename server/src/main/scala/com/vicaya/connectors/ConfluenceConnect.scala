@@ -5,10 +5,8 @@ import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.vicaya.app.response.{ConnectorEnum, Document}
 import org.apache.http.auth.UsernamePasswordCredentials
-import org.apache.http.impl.auth.BasicScheme
 import org.asynchttpclient.Dsl.asyncHttpClient
-import org.asynchttpclient.{AsyncHttpClient, ListenableFuture, Realm, Response}
-import java.util.concurrent.{CompletableFuture, Future}
+import org.asynchttpclient.{AsyncHttpClient, Realm}
 
 object ConfluenceConnect {
   def main(args: Array[String]): Unit = {
@@ -53,19 +51,22 @@ class ConfluenceConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper) exten
           title = result.title))
       } else Seq.empty
     }
-
   }
 
-  @JsonIgnoreProperties(ignoreUnknown = true)
-  case class ConfluenceResponse(@JsonProperty("results") results: List[ConfluenceResult],
-                                start: Int,
-                                limit: Int,
-                                size: Int)
+}
 
-  case class ConfluenceResult(id: String,
-                              status: String,
-                              title: String,
-                              @JsonProperty("type") category: String,
-                              @JsonProperty("_links") links: Link)
+@JsonIgnoreProperties(ignoreUnknown = true)
+case class ConfluenceResponse(@JsonProperty("results") results: List[ConfluenceResult],
+                              start: Int,
+                              limit: Int,
+                              size: Int)
 
-  case class Link(webui: String, self: String, tinyui: String)
+case class ConfluenceResult(id: String,
+                            status: String,
+                            title: String,
+                            @JsonProperty("type") category: String,
+                            @JsonProperty("_links") links: Link)
+
+case class Link(webui: String, self: String, tinyui: String)
+
+

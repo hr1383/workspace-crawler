@@ -2,7 +2,7 @@ package com.vicaya.app.response
 
 object ConnectorEnum extends Enumeration {
   type Connector = Value
-  val GDRIVE, CONFLUENCE, DROPBOX = Value
+  val GDRIVE, CONFLUENCE, DROPBOX, JIRA = Value
 }
 
 case class Document(source: String,
@@ -10,5 +10,6 @@ case class Document(source: String,
                     url: String = "",
                     author: String = "",
                     id: String = "",
-                    title: String = "")
+                    title: String = "",
+                    description: String = "")
 
