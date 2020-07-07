@@ -52,6 +52,7 @@ class ConfluenceConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper) exten
       } else Seq.empty
     }
   }
+}
 
 }
 
