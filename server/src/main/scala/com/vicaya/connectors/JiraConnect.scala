@@ -7,9 +7,11 @@ import com.vicaya.app.response.{ConnectorEnum, Document}
 import org.apache.http.auth.UsernamePasswordCredentials
 import org.asynchttpclient.Dsl.asyncHttpClient
 import org.asynchttpclient.{AsyncHttpClient, Realm}
+import org.slf4j.{Logger, LoggerFactory}
 
 
 object JiraConnect {
+  val logger: Logger = LoggerFactory.getLogger("com.vicaya.connectors.JiraConnect")
   def main(args: Array[String]): Unit = {
     val httpClient = asyncHttpClient()
     val mapper = new ObjectMapper()
@@ -17,14 +19,14 @@ object JiraConnect {
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     val driveConnect = new JiraConnect(httpClient, mapper)
-    System.out.println(driveConnect.searchContent("body"))
+    logger.info(s"${driveConnect.searchContent("body")}")
     httpClient.close()
   }
 }
 
 
 class JiraConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper) extends SearchConnect {
-
+  import JiraConnect._
   val PARENT_URL = "https://workplace-xyz.atlassian.net"
   val SEARCH_API = "/rest/api/2/search?"
   val email = "hrsht.rastogi13@gmail.com"
@@ -41,8 +43,8 @@ class JiraConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper) extends Sea
       .build();
     //todo make it async
     val response = httpGet.setRealm(realm).execute().get()
-    System.out.println("Response " + response.getStatusCode)
-    System.out.println("Response body " + response.getResponseBody)
+    logger.info("Response " + response.getStatusCode)
+    logger.info("Response body " + response.getResponseBody)
     if (response.getStatusCode != 200) {
       Seq.empty
     } else {

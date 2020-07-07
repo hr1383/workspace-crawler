@@ -7,8 +7,10 @@ import com.vicaya.app.response.{ConnectorEnum, Document}
 import org.apache.http.auth.UsernamePasswordCredentials
 import org.asynchttpclient.Dsl.asyncHttpClient
 import org.asynchttpclient.{AsyncHttpClient, Realm}
+import org.slf4j.{Logger, LoggerFactory}
 
 object ConfluenceConnect {
+  val logger: Logger = LoggerFactory.getLogger("com.vicaya.connectors.ConfluenceConnect")
   def main(args: Array[String]): Unit = {
     val httpClient = asyncHttpClient()
     val mapper = new ObjectMapper()
@@ -16,13 +18,13 @@ object ConfluenceConnect {
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     val driveConnect = new ConfluenceConnect(httpClient, mapper)
-    System.out.println(driveConnect.searchContent("body"))
+    logger.info(s"${driveConnect.searchContent("body")}")
     httpClient.close()
   }
 }
 
 class ConfluenceConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper) extends SearchConnect {
-
+  import ConfluenceConnect._
   val PARENT_URL = "https://workplace-xyz.atlassian.net"
   val SEARCH_API = "/wiki/rest/api/content/search?"
   val email = "hrsht.rastogi13@gmail.com"
@@ -31,7 +33,7 @@ class ConfluenceConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper) exten
 
   override def searchContent(text: String, pageSize: Int): Seq[Document] = {
     val requestUrl = PARENT_URL + SEARCH_API + "cql=text~" + text
-    System.out.println(requestUrl)
+    logger.info(requestUrl)
     val httpGet = httpClient.prepareGet(requestUrl)
     val realm = new Realm.Builder(email, authToken)
       .setUsePreemptiveAuth(true)
@@ -39,8 +41,8 @@ class ConfluenceConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper) exten
       .build();
     //todo make it async
     val response = httpGet.setRealm(realm).execute().get()
-    System.out.println("Response " + response.getStatusCode)
-    System.out.println("Response body " + response.getResponseBody)
+    logger.info("Response " + response.getStatusCode)
+    logger.info("Response body " + response.getResponseBody)
     if (response.getStatusCode != 200) {
       Seq.empty
     } else {
@@ -52,8 +54,6 @@ class ConfluenceConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper) exten
       } else Seq.empty
     }
   }
-}
-
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
