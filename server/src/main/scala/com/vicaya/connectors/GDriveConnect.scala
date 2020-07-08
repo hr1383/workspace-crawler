@@ -2,6 +2,7 @@ package com.vicaya.connectors
 
 import com.google.api.services.drive.Drive
 import com.vicaya.app.response.{ConnectorEnum, Document}
+import org.slf4j.{Logger, LoggerFactory}
 
 
 object GDriveConnect {
@@ -14,7 +15,7 @@ object GDriveConnect {
 }
 
 class GDriveConnect(service: Drive) extends SearchConnect {
-
+  val logger: Logger = LoggerFactory.getLogger("com.vicaya.connectors.GDriveConnect")
   def searchContent(text: String, pageSize: Int = 10): Seq[Document] = {
 
     // Print the names and IDs for up to 10 files.
@@ -26,7 +27,7 @@ class GDriveConnect(service: Drive) extends SearchConnect {
       .execute
     val files = result.getFiles
     if (files == null || files.isEmpty) {
-      System.out.println("No files found.")
+      logger.info("No files found.")
       Seq.empty
     }
     else {
