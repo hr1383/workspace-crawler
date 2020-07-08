@@ -1,12 +1,11 @@
 package com.vicaya.connectors
 
-import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonProperty}
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.vicaya.app.response.{ConnectorEnum, Document}
-import org.apache.http.auth.UsernamePasswordCredentials
+import org.asynchttpclient.AsyncHttpClient
 import org.asynchttpclient.Dsl.asyncHttpClient
-import org.asynchttpclient.{AsyncHttpClient, Realm}
 
 
 object BoxConnect {
@@ -17,7 +16,7 @@ object BoxConnect {
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     val driveConnect = new BoxConnect(httpClient, mapper)
-    System.out.println(driveConnect.searchContent("financial"))
+//    System.out.println(driveConnect.searchContent("financial"))
     httpClient.close()
   }
 }
@@ -30,13 +29,11 @@ class BoxConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper) extends Sear
 
   override def searchContent(text: String, pageSize: Int): Seq[Document] = {
     val requestUrl = PARENT_URL + "?query=" + text
-    System.out.println(requestUrl)
     val httpGet = httpClient.prepareGet(requestUrl)
-    httpGet.setHeader("Authorization", "Bearer 6VsqPzA0Mw8xt30uh4qi0Q6RZi0JhBuB")
+    //token expires in an hour
+    httpGet.setHeader("Authorization", "Bearer xxxx")
     //todo make it async
     val response = httpGet.execute().get()
-    System.out.println("Response code " + response.getStatusCode)
-//    System.out.println("Response body " + response.getResponseBody)
     if (response.getStatusCode != 200) {
       Seq.empty
     } else {
