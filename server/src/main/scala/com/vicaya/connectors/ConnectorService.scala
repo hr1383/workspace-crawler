@@ -8,20 +8,23 @@ object ConnectorService {
   val logger: Logger = LoggerFactory.getLogger("com.vicaya.connectors.ConnectorService")
   def apply(gDriveConnect: GDriveConnect,
             confluenceConnect: ConfluenceConnect,
-            jiraConnect: JiraConnect): ConnectorService = new ConnectorService(gDriveConnect, confluenceConnect, jiraConnect)
+            jiraConnect: JiraConnect,
+            boxConnect: BoxConnect): ConnectorService = new ConnectorService(gDriveConnect,
+    confluenceConnect, jiraConnect, boxConnect)
 }
 
 class ConnectorService(gDriveConnect: GDriveConnect,
                        confluenceConnect: ConfluenceConnect,
-                       jiraConnect: JiraConnect) {
+                       jiraConnect: JiraConnect,
+                       boxConnect: BoxConnect) {
   import ConnectorService._
+
   def search(text: String): Seq[Document] = {
     logger.info("searching for " + text)
     val gDocument = gDriveConnect.searchContent(text)
     //add more connectors
     val confluenceDocument = confluenceConnect.searchContent(text)
-    logger.info("size " + gDocument.size + "  " + confluenceDocument.size)
-    gDocument ++ confluenceDocument ++ jiraConnect.searchContent(text)
+    gDocument ++ confluenceDocument ++ jiraConnect.searchContent(text) ++ boxConnect.searchContent(text)
   }
 
 }
