@@ -7,20 +7,22 @@ object ConnectorService {
 
   def apply(gDriveConnect: GDriveConnect,
             confluenceConnect: ConfluenceConnect,
-            jiraConnect: JiraConnect): ConnectorService = new ConnectorService(gDriveConnect, confluenceConnect, jiraConnect)
+            jiraConnect: JiraConnect,
+            boxConnect: BoxConnect): ConnectorService = new ConnectorService(gDriveConnect,
+    confluenceConnect, jiraConnect, boxConnect)
 }
 
 class ConnectorService(gDriveConnect: GDriveConnect,
                        confluenceConnect: ConfluenceConnect,
-                       jiraConnect: JiraConnect) {
+                       jiraConnect: JiraConnect,
+                       boxConnect: BoxConnect) {
 
   def search(text: String): Seq[Document] = {
     System.out.println("searching for " + text)
     val gDocument = gDriveConnect.searchContent(text)
     //add more connectors
     val confluenceDocument = confluenceConnect.searchContent(text)
-    System.out.println("size " + gDocument.size + "  " + confluenceDocument.size)
-    gDocument ++ confluenceDocument ++ jiraConnect.searchContent(text)
+    gDocument ++ confluenceDocument ++ jiraConnect.searchContent(text) ++ boxConnect.searchContent(text)
   }
 
 }

@@ -2,7 +2,7 @@ package com.vicaya.app.response
 
 object ConnectorEnum extends Enumeration {
   type Connector = Value
-  val GDRIVE, CONFLUENCE, DROPBOX, JIRA = Value
+  val GDRIVE, CONFLUENCE, DROPBOX, JIRA, BOX = Value
 }
 
 case class Document(source: String,
