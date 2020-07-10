@@ -1,5 +1,6 @@
 package com.vicaya.database.rest.service
 
+import java.time.Instant
 import java.util.concurrent.atomic.AtomicLong
 
 import com.vicaya.app.configuration.ServiceResponse
@@ -8,6 +9,8 @@ import com.vicaya.database.models.Username
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.{Consumes, GET, POST, Path, PathParam, Produces}
 import org.slf4j.{Logger, LoggerFactory}
+import com.vicaya.common.util.prefix.UserSid
+import com.vicaya.common.util.Sid
 
 import scala.util.{Failure, Success, Try}
 
@@ -18,7 +21,7 @@ object UserResource {
     }
 }
 
-case class User(name: String, company: String)
+case class User(userName: String, accountSid: String)
 
 @Path("/user")
 class UserResource(baseDaoService: BaseDaoService) {
@@ -29,15 +32,15 @@ class UserResource(baseDaoService: BaseDaoService) {
 
     //curl -XGET http://localhost:9460/user/find/1
     @GET
-    @Path("/find/{id}")
+    @Path("/find/{sid}")
     @Consumes(Array(MediaType.APPLICATION_JSON))
     @Produces(Array(MediaType.APPLICATION_JSON))
-    def findUser(@PathParam("id") id: Long): ServiceResponse[Username] = {
-        Try(userDao.find(id)) match {
+    def findUser(@PathParam("sid") sid: String): ServiceResponse[Username] = {
+        Try(userDao.find(sid)) match {
             case Success(value) =>
                 successCase(value)
             case Failure(exception: Exception) =>
-                failedCase(s"Failed to fetch user with $id", exception)
+                failedCase(s"Failed to fetch user with $sid", exception)
         }
     }
 
@@ -49,10 +52,12 @@ class UserResource(baseDaoService: BaseDaoService) {
     def create(username: User): ServiceResponse[Username] = {
         Try {
             userDao.create(Username(
-                name = username.name,
-                company = username.company,
-                isActive = true,
-                id = atomicLong.incrementAndGet()
+                userSid = "",
+                userName = username.userName,
+                accountSid = username.accountSid,
+                timeCreated = Instant.now().toEpochMilli,
+                timeLastLogin = Instant.now().toEpochMilli,
+                isActive = true
             ))
         } match {
             case Success(value) =>

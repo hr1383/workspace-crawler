@@ -42,9 +42,8 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
 
   override def run(conf: WorkSpaceCrawlerConfiguration, env: Environment): Unit = {
 
-    val ctx: _root_.io.getquill.PostgresJdbcContext[_root_.io.getquill.SnakeCase] with ImplicitQuery = dbConnect(conf)
+    val ctx: PostgresJdbcContext[SnakeCase] with ImplicitQuery = dbConnect(conf)
     // Init resource class
-//    env.jersey().register(new WorkSpaceResource())
     val httpClient = asyncHttpClient()
     val mapper = new ObjectMapper()
     mapper.registerModule(DefaultScalaModule)
@@ -93,7 +92,7 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
   }
 
   def startEmbeddedDatabase(): EmbeddedPostgres = {
-    val server = EmbeddedPostgres.builder().setPort(5435).start()
+    val server = EmbeddedPostgres.builder().setPort(5432).start()
     server
   }
 
