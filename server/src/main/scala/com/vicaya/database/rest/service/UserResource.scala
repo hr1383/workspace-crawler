@@ -4,13 +4,12 @@ import java.time.Instant
 import java.util.concurrent.atomic.AtomicLong
 
 import com.vicaya.app.configuration.ServiceResponse
+import com.vicaya.common.sidutil.Sid
 import com.vicaya.database.dao.service.{BaseDaoService, UsernameDao}
 import com.vicaya.database.models.Username
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.{Consumes, GET, POST, Path, PathParam, Produces}
 import org.slf4j.{Logger, LoggerFactory}
-import com.vicaya.common.util.prefix.UserSid
-import com.vicaya.common.util.Sid
 
 import scala.util.{Failure, Success, Try}
 

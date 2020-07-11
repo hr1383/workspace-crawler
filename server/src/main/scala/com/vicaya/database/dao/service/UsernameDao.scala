@@ -1,8 +1,8 @@
 package com.vicaya.database.dao.service
 
+import com.vicaya.common.sidutil.SidUtil
+import com.vicaya.common.sidutil.sid._
 import com.vicaya.database.models.Username
-import com.vicaya.common.util.prefix.UserSid
-import com.vicaya.common.util.{Sid, SidUtil}
 import org.slf4j.{Logger, LoggerFactory}
 
 object UsernameDao {

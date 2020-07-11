@@ -9,9 +9,14 @@ import com.vicaya.database.dao.service.{BaseDaoService, UsernameDao}
 import com.vicaya.database.models.Username
 import java.time.Instant
 
+import com.vicaya.common.util.VicayaUtils
+
+
 class UsernameDaoTest extends FlatSpec with BeforeAndAfterAllMulti with Matchers {
 
-    val server = EmbeddedPostgres.builder().setPort(5432).start()
+    val SQL_PATH_PREFIX: String = "src/main/resources/db/V1_Initial_Schema_Create.sql"
+    val DROP_SQL_PATH_PREFIX: String = "src/main/resources/db/V1_Clean.sql"
+    val server: EmbeddedPostgres = EmbeddedPostgres.builder().setPort(5432).start()
     val ctx: PostgresJdbcContext[SnakeCase] = buildPostgres
     var connection: java.sql.Connection = _
 
@@ -20,15 +25,12 @@ class UsernameDaoTest extends FlatSpec with BeforeAndAfterAllMulti with Matchers
 
     override def beforeAll(): Unit = {
         val statement = connection.createStatement()
-        val createUsername = "" +
-          "CREATE TABLE IF NOT EXISTS username (user_sid varchar NOT NULL, user_name varchar NOT NULL, account_sid varchar NOT NULL, time_created bigint, time_last_login bigint, is_active boolean NOT NULL);"
-        statement.execute(createUsername)
+        statement.execute(VicayaUtils.readFileContent(SQL_PATH_PREFIX))
     }
 
     override def afterAll(): Unit = {
         val statement = connection.createStatement()
-        val deleteUsername = "DROP TABLE IF EXISTS username;"
-        statement.execute(deleteUsername)
+        statement.execute(VicayaUtils.readFileContent(DROP_SQL_PATH_PREFIX))
     }
 
     "PostgresQuery" should "used be able to create user " in {
@@ -81,6 +83,7 @@ class UsernameDaoTest extends FlatSpec with BeforeAndAfterAllMulti with Matchers
         val ds = new HikariDataSource(config)
         val ctx = new PostgresJdbcContext[SnakeCase](SnakeCase, ds)
         connection = ds.getConnection
+
         ctx
     }
 }

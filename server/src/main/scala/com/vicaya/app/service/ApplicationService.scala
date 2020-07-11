@@ -21,6 +21,7 @@ import com.vicaya.connectors.{BoxConnect, ConfluenceConnect, ConnectorService, G
 import com.vicaya.database.dao.service.BaseDaoService
 import com.vicaya.database.rest.service.UserResource
 import com.vicaya.app.resources.ServiceResource
+import com.vicaya.common.util.VicayaUtils
 import io.dropwizard.setup.{Bootstrap, Environment}
 import org.slf4j.{Logger, LoggerFactory}
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
@@ -35,6 +36,7 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
 
   final val HttpClientName: String = "workspace-crawler-http"
   final val databaseName: String = "vicaya"
+  final val SQL_PATH_PREFIX: String = "/db/V1_Initial_Schema_Create.sql"
 
   override def init(bootstrap: Bootstrap[WorkSpaceCrawlerConfiguration]): Unit = {
     super.init(bootstrap)
@@ -84,7 +86,7 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
     Try(ds.getConnection) match {
       case Success(_) =>
         logger.info(s"Successfully connected to Postgres ${ds.getJdbcUrl}")
-
+        createDatabaseSchema(ds.getConnection, dbConfig.sqlFileLocation)
       case Failure(exception) =>
         logger.info(s"Failed to connected to Postgres ${ds.getJdbcUrl}", exception)
     }
@@ -94,6 +96,13 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
   def startEmbeddedDatabase(): EmbeddedPostgres = {
     val server = EmbeddedPostgres.builder().setPort(5432).start()
     server
+  }
+
+  def createDatabaseSchema(connection: java.sql.Connection, fileLocation: String): Unit = {
+    val statement = connection.createStatement()
+    //val sqlFile = getClass.getResource(fileLocation)
+    println(s"Running sql file $fileLocation")
+    statement.execute(VicayaUtils.readFileContent(fileLocation))
   }
 
   private val APPLICATION_NAME = "Google Drive API Search Content"

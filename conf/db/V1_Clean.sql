@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS username;
+DROP TABLE IF EXISTS user_preference;
+DROP TABLE IF EXISTS accounts;
+DROP TABLE IF EXISTS roles;
+DROP TABLE IF EXISTS connector;
+DROP TABLE IF EXISTS connector_details;
+
+

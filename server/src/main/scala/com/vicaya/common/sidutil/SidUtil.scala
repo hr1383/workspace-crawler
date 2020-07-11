@@ -1,4 +1,4 @@
-package com.vicaya.common.util
+package com.vicaya.common.sidutil
 
 import java.net.InetAddress
 import java.security.SecureRandom

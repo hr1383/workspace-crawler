@@ -43,7 +43,8 @@ case class DatabaseConfig(
  @JsonProperty validationQuery: String,
  @JsonProperty min: Int,
  @JsonProperty maxSize: Int,
- @JsonProperty checkConnectionWhileIdle: Boolean
+ @JsonProperty checkConnectionWhileIdle: Boolean,
+ @JsonProperty sqlFileLocation: String
 )
 
 /* Request / Response Formats */

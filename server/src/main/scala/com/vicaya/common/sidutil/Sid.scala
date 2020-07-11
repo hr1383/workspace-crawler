@@ -1,4 +1,4 @@
-package com.vicaya.common.util
+package com.vicaya.common.sidutil
 
 object Sid {
   def apply(prefix: String): Sid = {

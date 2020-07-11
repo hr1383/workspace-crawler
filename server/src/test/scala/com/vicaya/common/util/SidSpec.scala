@@ -1,8 +1,9 @@
 package com.vicaya.common.util
 
 import com.datasift.dropwizard.scala.test.BeforeAndAfterAllMulti
+import com.vicaya.common.sidutil.SidUtil
+import com.vicaya.common.sidutil.sid._
 import org.scalatest.{FlatSpec, Matchers}
-import com.vicaya.common.util.prefix._
 
 class SidSpec extends FlatSpec with BeforeAndAfterAllMulti with Matchers {
 
