@@ -29,7 +29,7 @@ class UserResource(baseDaoService: BaseDaoService) {
     val userDao: UsernameDao = new UsernameDao(baseDaoService)
     val atomicLong: AtomicLong = new AtomicLong()
 
-    //curl -XGET http://localhost:9460/user/find/1
+    //curl -XGET http://localhost:8080/user/find/USe04103cdb8c528ea2b6f3a46a57b542d
     @GET
     @Path("/find/{sid}")
     @Consumes(Array(MediaType.APPLICATION_JSON))
@@ -43,7 +43,7 @@ class UserResource(baseDaoService: BaseDaoService) {
         }
     }
 
-    // e.g curl - XPOST - v http://localhost:9460/user/create -d '{"name": "rohit","company": "vicaya"}' -H "Accept: application/json" -H "Content-Type: application/json"
+    // e.g curl -XPOST -v http://localhost:8080/user/create -d '{"userName": "rohit","accountSid": "vicaya"}' -H "Accept: application/json" -H "Content-Type: application/json"
     @POST
     @Path("/create")
     @Consumes(Array(MediaType.APPLICATION_JSON))
