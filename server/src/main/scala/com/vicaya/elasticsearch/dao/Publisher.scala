@@ -3,8 +3,10 @@ package com.vicaya.elasticsearch.dao
 import java.nio.charset.StandardCharsets
 
 import org.elasticsearch.action.ActionListener
+import org.elasticsearch.action.index.{IndexRequest, IndexResponse}
 import org.elasticsearch.action.ingest.PutPipelineRequest
 import org.elasticsearch.action.support.master.AcknowledgedResponse
+import org.elasticsearch.client.indices.{CreateIndexRequest, CreateIndexResponse, GetIndexRequest}
 import org.elasticsearch.client.{RequestOptions, RestHighLevelClient}
 import org.elasticsearch.common.bytes.BytesArray
 import org.elasticsearch.common.unit.TimeValue
@@ -13,20 +15,27 @@ import org.elasticsearch.common.xcontent.XContentType
 abstract class Publisher(client: RestHighLevelClient) {
   val index: String
   val source: String
-  def builder(id: String, json: BytesArray): PutPipelineRequest = {
-    new PutPipelineRequest(
-      id,
-      json,
-      XContentType.JSON
-    )
-      .timeout(TimeValue.timeValueMinutes(2))
+  def builder(id: String, json: BytesArray): IndexRequest = {
+    if (!indexExists(index)) {
+      createIndex(index)
+    }
+    new IndexRequest(index).id(id).source(json, XContentType.JSON)
+    .timeout(TimeValue.timeValueMinutes(2))
   }
   def toByteArray(json: String): BytesArray = {
     new BytesArray(json.getBytes(StandardCharsets.UTF_8))
   }
-  def write(request: PutPipelineRequest): Boolean = {
-    val listener: ActionListener[AcknowledgedResponse] = new ActionListener[AcknowledgedResponse] {
-      override def onResponse(response: AcknowledgedResponse): Unit = {
+  def createIndex(index: String): CreateIndexResponse = {
+    val request = new CreateIndexRequest(index)
+    client.indices().create(request, RequestOptions.DEFAULT)
+  }
+
+  def indexExists(index: String):Boolean = {
+    client.indices().exists(new GetIndexRequest(index), RequestOptions.DEFAULT)
+  }
+  def write(request: IndexRequest): Boolean = {
+    val listener: ActionListener[IndexResponse] = new ActionListener[IndexResponse] {
+      override def onResponse(response: IndexResponse): Unit = {
         println(s"${response}")
         true
       }
@@ -35,7 +44,7 @@ abstract class Publisher(client: RestHighLevelClient) {
         false
       }
     }
-    client.ingest().putPipelineAsync(request, RequestOptions.DEFAULT, listener)
+    client.indexAsync(request, RequestOptions.DEFAULT, listener)
     true
   }
   def publish(id: String, json: String): Boolean = {

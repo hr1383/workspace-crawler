@@ -16,7 +16,7 @@ import io.circe.generic.auto._
 import io.circe.syntax._
 
 object BoxConnect {
-  val Token: String = "m3z9VjcAc8GF9dyxHkmRaE4ZdomE7lXW"
+  val Token: String = "jAqq7ODU9UsYrT1uPRfwjtGnF6hd1zDR"
   val ClientId: String = "lpncbi12x6tsxt3uw5o9w46o60c2tuba"
   val ClientSecret: String = "MhM2dJLiB7mLC5Z9m86fM6iO7YSaW3ul"
 

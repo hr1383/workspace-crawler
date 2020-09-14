@@ -32,6 +32,11 @@ import org.asynchttpclient.Dsl._
 import org.elasticsearch.client.{ElasticsearchClient, RestClient, RestHighLevelClient}
 import org.apache.http.HttpHost
 import com.fasterxml.jackson.annotation.JsonFormat
+import org.apache.http.auth.{AuthScope, UsernamePasswordCredentials}
+import org.apache.http.impl.client.BasicCredentialsProvider
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder
+import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
+
 import scala.util.{Failure, Success, Try}
 
 object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration] {
@@ -120,9 +125,20 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
   }
 
   def initElasticsearch(): RestHighLevelClient = {
+
+    val credentialsProvider = new BasicCredentialsProvider()
+    credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("enterprise_search", "pcDrxUHDBPafJOcPf3BZ"))
+
     val client: RestHighLevelClient = new RestHighLevelClient(
       RestClient.builder(
-        new HttpHost("localhost", 9200, "http")))
+        new HttpHost("localhost", 9200, "http"))
+        .setHttpClientConfigCallback(new HttpClientConfigCallback() {
+          override def customizeHttpClient(httpAsyncClientBuilder: HttpAsyncClientBuilder): HttpAsyncClientBuilder = {
+             httpAsyncClientBuilder.setDefaultCredentialsProvider(credentialsProvider)
+          }
+        })
+    )
+
     client
   }
 
