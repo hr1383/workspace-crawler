@@ -29,9 +29,6 @@ object BoxConnect {
 class BoxConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxAPIConnection, publisher: BoxPublisher) extends SearchConnect {
   val logger: Logger = LoggerFactory.getLogger("BoxConnect")
 
-//  val gsonBuilder: GsonBuilder = new GsonBuilder()
-//  val gson: Gson = gsonBuilder.create()
-
   val PARENT_URL = "https://api.box.com/2.0/search"
   val LINK_URL  = "http://app.box.com/"
 
@@ -67,12 +64,6 @@ class BoxConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxA
 
   import io.circe.{ Decoder, Encoder, HCursor, Json }
   implicit val encodeBox: Encoder[BoxFileMetadata] = Encoder[BoxFileMetadata]
-//  {
-//    final def apply(a: BoxFileMetadata): Json = Json.obj(
-//      ("type", Json.fromString(a.`type`)),
-//      ("bar", Json.fromInt(a.))
-//    )
-//  }
 
   def publish(metas: Seq[BoxItem#Info]): Unit = {
     metas.foreach(meta => {

@@ -12,6 +12,8 @@ object BoxResource {
 @Path("/v1/box")
 class BoxResource(boxConnect: BoxConnect) {
 
+  //curl -XPOST http://localhost:8080/v1/box/crawl -H 'Content-Type: application/json' -H "Accept: application/json"
+
   @POST
   @Path("/crawl")
   @Consumes(Array(MediaType.APPLICATION_JSON))

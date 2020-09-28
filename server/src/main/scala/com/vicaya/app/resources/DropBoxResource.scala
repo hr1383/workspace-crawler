@@ -17,6 +17,7 @@ object DropBoxResource {
 @Path("/v1/dropbox")
 class DropBoxResource(dropBoxConnect: DropBoxConnect) {
 
+  //curl -XPOST http://localhost:8080/v1/dropbox/crawl -H 'Content-Type: application/json' -H "Accept: application/json"
   @POST
   @Path("/crawl")
   @Consumes(Array(MediaType.APPLICATION_JSON))

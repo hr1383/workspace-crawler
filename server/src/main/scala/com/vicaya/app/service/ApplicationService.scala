@@ -22,8 +22,8 @@ import com.vicaya.app.resources._
 import com.vicaya.database.dao.service.BaseDaoService
 import com.vicaya.database.rest.service.UserResource
 import com.vicaya.common.util.VicayaUtils
-import com.vicaya.connectors.{BoxConnect, DropBoxConnect}
-import com.vicaya.elasticsearch.dao.{BoxPublisher, DropBoxPublisher}
+import com.vicaya.connectors.{BoxConnect, DropBoxConnect, GitHubConnect}
+import com.vicaya.elasticsearch.dao.{BoxPublisher, DropBoxPublisher, GitHubPublisher}
 import io.dropwizard.setup.{Bootstrap, Environment}
 import org.slf4j.{Logger, LoggerFactory}
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
@@ -36,6 +36,7 @@ import org.apache.http.auth.{AuthScope, UsernamePasswordCredentials}
 import org.apache.http.impl.client.BasicCredentialsProvider
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder
 import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
+import org.kohsuke.github.GitHubBuilder
 
 import scala.util.{Failure, Success, Try}
 
@@ -67,6 +68,8 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
     val client =  new BoxAPIConnection(BoxConnect.ClientId, BoxConnect.ClientSecret, BoxConnect.Token, null)
 
     val boxConnector: BoxConnect = BoxConnect(httpClient, mapper, client, new BoxPublisher(esClient))
+    val gitHubClient = new GitHubBuilder().withOAuthToken(GitHubConnect.Token).build
+    val gitHubConnector: GitHubConnect = GitHubConnect(gitHubClient, mapper, new GitHubPublisher(esClient))
 
     env.jersey().register(new UserResource(new BaseDaoService(ctx)))
 //    env.jersey().register(new ServiceResource(new ConnectorService(
@@ -76,6 +79,7 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
 //      new BoxConnect(httpClient, mapper))))
     env.jersey().register(new DropBoxResource(dropboxConnector))
     env.jersey().register(new BoxResource(boxConnector))
+    env.jersey().register(new GitHubResource(gitHubConnector))
   }
 
   private def dbConnect(conf: WorkSpaceCrawlerConfiguration) = {
