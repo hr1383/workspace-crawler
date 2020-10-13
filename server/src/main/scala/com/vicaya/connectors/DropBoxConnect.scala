@@ -121,6 +121,21 @@ class DropBoxConnect(client: DbxClientV2, mapper: ObjectMapper, publisher: DropB
     }
     true
   }
+
+//  def crawlThenDownload(): Boolean = {
+//    val metas: Seq[DBMetadata] = startCrawler()
+//    if (metas != null && metas.nonEmpty) {
+//      logger.info(s"Crawling done.., Found ${metas.size} files to publish to ES")
+//      download(metas)
+//    }
+//    true
+//  }
+
+//  def download(metas: Seq[DBMetadata]): Boolean = {
+//    metas.map(meta => {
+//      client.files().downloadBuilder("./").download()
+//    })
+//  }
 }
 
 case class DBMetadata (

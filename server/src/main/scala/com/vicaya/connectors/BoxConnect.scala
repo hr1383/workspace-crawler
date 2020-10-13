@@ -3,7 +3,7 @@ package com.vicaya.connectors
 
 import java.sql.Timestamp
 
-import com.box.sdk.{BoxAPIConnection, BoxFolder, BoxItem}
+import com.box.sdk.{BoxAPIConnection, BoxFile, BoxFolder, BoxItem}
 import com.fasterxml.jackson.annotation.{JsonFormat, JsonProperty}
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.vicaya.app.response.{ConnectorEnum, Document}
@@ -15,10 +15,12 @@ import scala.collection.JavaConversions._
 import io.circe.generic.auto._
 import io.circe.syntax._
 
+import scala.util.{Failure, Success, Try}
+
 object BoxConnect {
-  val Token: String = "jAqq7ODU9UsYrT1uPRfwjtGnF6hd1zDR"
+  val Token: String = "6ctmkWASysN1a2328zpA6mZ1RXkZxxZ6"
   val ClientId: String = "lpncbi12x6tsxt3uw5o9w46o60c2tuba"
-  val ClientSecret: String = "MhM2dJLiB7mLC5Z9m86fM6iO7YSaW3ul"
+  val ClientSecret: String = "4BOnTTM2hDfi9jWtpLkwQnCmO0nYE5Vr"
 
   def apply(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxAPIConnection, publisher: BoxPublisher): BoxConnect = {
     new BoxConnect(httpClient, mapper, client, publisher)
@@ -62,6 +64,16 @@ class BoxConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxA
     true
   }
 
+  def crawlThenDownload(): Boolean = {
+    val rootFolder = BoxFolder.getRootFolder(client)
+    val metas: Seq[BoxItem#Info] = startCrawler(rootFolder)
+    if (metas != null && metas.nonEmpty) {
+      logger.info(s"Crawling done.., Found ${metas.size} files to publish to ES")
+      download(metas)
+    }
+    true
+  }
+
   import io.circe.{ Decoder, Encoder, HCursor, Json }
   implicit val encodeBox: Encoder[BoxFileMetadata] = Encoder[BoxFileMetadata]
 
@@ -72,6 +84,26 @@ class BoxConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxA
       //val json: Json = metadata.asJson
       val str: String = mapper.writeValueAsString(metadata)
       publisher.publish(id, str)
+    })
+  }
+
+  import java.io.FileOutputStream
+  def download(metas: Seq[BoxItem#Info]): Unit = {
+    metas.foreach(meta => {
+     val download = Try {
+       val file: BoxFile = new BoxFile(client, meta.getID)
+       val info: BoxFile#Info = file.getInfo()
+       val stream = new FileOutputStream(info.getName)
+       file.download(stream)
+     } match {
+        case Success(value) =>
+            logger.info(s"Successfully downloaded file $value")
+          Some(value)
+        case Failure(exception) =>
+          logger.error("Error while downloading file", exception)
+         None
+      }
+      logger.info(s"Downloaded Info $download")
     })
   }
 

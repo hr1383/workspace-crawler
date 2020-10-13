@@ -1,7 +1,7 @@
 package com.vicaya.app.service
 
 import java.io.{File, FileNotFoundException, IOException, InputStreamReader}
-import java.util.Collections
+import java.util.{Collections, Properties}
 
 import com.box.sdk.BoxAPIConnection
 import com.datasift.dropwizard.scala.ScalaApplication
@@ -17,7 +17,7 @@ import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.client.util.store.FileDataStoreFactory
 import com.google.api.services.drive.{Drive, DriveScopes}
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
-import com.vicaya.app.configuration.{DatabaseConfig, WorkSpaceCrawlerConfiguration}
+import com.vicaya.app.configuration.{DatabaseConfig, KafkaProducerConfiguration, WorkSpaceCrawlerConfiguration}
 import com.vicaya.app.resources._
 import com.vicaya.database.dao.service.BaseDaoService
 import com.vicaya.database.rest.service.UserResource
@@ -31,10 +31,12 @@ import io.getquill.{ImplicitQuery, PostgresJdbcContext, SnakeCase}
 import org.asynchttpclient.Dsl._
 import org.elasticsearch.client.{ElasticsearchClient, RestClient, RestHighLevelClient}
 import org.apache.http.HttpHost
-import com.fasterxml.jackson.annotation.JsonFormat
+import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.http.auth.{AuthScope, UsernamePasswordCredentials}
 import org.apache.http.impl.client.BasicCredentialsProvider
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder
+import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSerializer}
 import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
 import org.kohsuke.github.GitHubBuilder
 
@@ -45,7 +47,7 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
   val logger: Logger = LoggerFactory.getLogger("com.work.space.crawler.CrawlerService")
 
   final val HttpClientName: String = "workspace-crawler-http"
-  final val databaseName: String = "vicaya"
+  final val databaseName: String = "vicayah"
   final val SQL_PATH_PREFIX: String = "/db/V1_Initial_Schema_Create.sql"
 
   override def init(bootstrap: Bootstrap[WorkSpaceCrawlerConfiguration]): Unit = {
@@ -56,6 +58,9 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
 
     val ctx: PostgresJdbcContext[SnakeCase] with ImplicitQuery = dbConnect(conf)
     val esClient: RestHighLevelClient = initElasticsearch()
+
+    // Init Kafka
+    val kafkaProducer:KafkaProducer[String, Array[Byte]] = initKafkaProducer(conf.kafkaProducerConfiguration)
 
     // Init resource class
     val httpClient = asyncHttpClient()
@@ -144,6 +149,22 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
     )
 
     client
+  }
+
+  def initKafkaProducer(conf: KafkaProducerConfiguration): KafkaProducer[String, Array[Byte]] = {
+    val props = new Properties()
+    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, conf.bootstrapServers)
+    props.put(ProducerConfig.CLIENT_ID_CONFIG, "VicayahProducer")
+    props.put(ProducerConfig.RETRIES_CONFIG.toString, conf.retries.toString)
+    props.put(ProducerConfig.ACKS_CONFIG, conf.acks)
+    props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, conf.compressionType)
+    props.put(ProducerConfig.BATCH_SIZE_CONFIG.toString, conf.batchSize.toString)
+    props.put(ProducerConfig.LINGER_MS_CONFIG.toString, conf.lingerMs.toString)
+    props.put(ProducerConfig.MAX_BLOCK_MS_CONFIG.toString, conf.maxBlockMs.toString)
+    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer")
+    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.ByteArraySerializer")
+    val producer = new KafkaProducer[String, Array[Byte]](props)
+    producer
   }
 
   private val APPLICATION_NAME = "Google Drive API Search Content"

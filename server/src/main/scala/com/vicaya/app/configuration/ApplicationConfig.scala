@@ -8,7 +8,8 @@ import io.dropwizard.Configuration
 case class WorkSpaceCrawlerConfiguration(
   @JsonProperty("elasticSearch") elasticSearchConfig: ElasticSearchConfig,
   @JsonProperty("httpConfig") httpConfig: HttpConfig,
-  @JsonProperty("databaseConfig") databaseConfig: DatabaseConfig
+  @JsonProperty("databaseConfig") databaseConfig: DatabaseConfig,
+  @JsonProperty("kafkaProducerConfiguration") kafkaProducerConfiguration: KafkaProducerConfiguration
 ) extends Configuration
 
 
@@ -45,6 +46,18 @@ case class DatabaseConfig(
  @JsonProperty maxSize: Int,
  @JsonProperty checkConnectionWhileIdle: Boolean,
  @JsonProperty sqlFileLocation: String
+)
+
+case class KafkaProducerConfiguration(
+   @JsonProperty bootstrapServers: String,
+   @JsonProperty topic: String,
+   @JsonProperty acks: String,
+   @JsonProperty retries: Long,
+   @JsonProperty batchSize: Long,
+   @JsonProperty lingerMs: Long,
+   @JsonProperty compressionType: String,
+   @JsonProperty maxBlockMs: Long,
+   @JsonProperty config: Map[String, String]
 )
 
 /* Request / Response Formats */

@@ -8,7 +8,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.JavaConversions._
 
 object GitHubConnect {
-  val Token: String = ""
+  val Token: String = "f9e373c8a9eaa74567fb2e124444e2648b7faa6e"
   val organizationName: String = "WorkplaceXYZ"
 
   def apply(client: GitHub,  mapper: ObjectMapper, publisher: GitHubPublisher): GitHubConnect = {

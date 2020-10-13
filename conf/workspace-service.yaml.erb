@@ -59,19 +59,19 @@ elasticSearch:
 
 databaseConfig:
   # Run Embedded mode
-  embeddedMode: true
+  embeddedMode: false
 
   # the name of your JDBC driver
   driverClass: org.postgresql.Driver
 
   # the username
-  user: pg-user
+  user: postgres
 
   # the password
   password: iAMs00perSecrEET
 
   # the JDBC URL
-  url: jdbc:postgresql://localhost:5432
+  url: jdbc:postgresql://localhost:5432/vicayah
 
   # any properties specific to your JDBC driver:
   properties:
@@ -95,3 +95,15 @@ databaseConfig:
 
   # Location of the sql file to execute
   sqlFileLocation: "/Users/rgupta/Development/PERSONAL/workspace-crawler/server/src/main/resources/db/V1_Initial_Schema_Create.sql"
+
+kafkaProducerConfig:
+  bootstrapServers: localhost:9092
+  topic: "Vicayah.FileMetaData"
+  acks: all
+  retries: 2147483647
+  batchSize: 16384
+  lingerMs: 5
+  compressionType: snappy
+  maxBlockMs: 1000
+  conf:
+    request.timeout.ms: 3600000
