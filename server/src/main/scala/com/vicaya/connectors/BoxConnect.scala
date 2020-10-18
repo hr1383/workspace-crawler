@@ -14,6 +14,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.JavaConversions._
 import io.circe.generic.auto._
 import io.circe.syntax._
+import org.apache.kafka.clients.producer.KafkaProducer
 
 import scala.util.{Failure, Success, Try}
 
@@ -22,13 +23,13 @@ object BoxConnect {
   val ClientId: String = "lpncbi12x6tsxt3uw5o9w46o60c2tuba"
   val ClientSecret: String = "4BOnTTM2hDfi9jWtpLkwQnCmO0nYE5Vr"
 
-  def apply(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxAPIConnection, publisher: BoxPublisher): BoxConnect = {
-    new BoxConnect(httpClient, mapper, client, publisher)
+  def apply(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxAPIConnection, publisher: BoxPublisher, kafkaProducer:KafkaProducer[String, Array[Byte]]): BoxConnect = {
+    new BoxConnect(httpClient, mapper, client, publisher, kafkaProducer)
   }
 }
 
 
-class BoxConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxAPIConnection, publisher: BoxPublisher) extends SearchConnect {
+class BoxConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxAPIConnection, publisher: BoxPublisher, kafkaProducer:KafkaProducer[String, Array[Byte]]) extends SearchConnect {
   val logger: Logger = LoggerFactory.getLogger("BoxConnect")
 
   val PARENT_URL = "https://api.box.com/2.0/search"
@@ -95,6 +96,8 @@ class BoxConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxA
        val info: BoxFile#Info = file.getInfo()
        val stream = new FileOutputStream(info.getName)
        file.download(stream)
+       // once downloaded publish to kafka
+       //kafkaProducer.send()
      } match {
         case Success(value) =>
             logger.info(s"Successfully downloaded file $value")

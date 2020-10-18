@@ -2,21 +2,22 @@ package com.vicaya.connectors
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.vicaya.elasticsearch.dao.GitHubPublisher
+import org.apache.kafka.clients.producer.KafkaProducer
 import org.kohsuke.github.{GHRepository, GitHub}
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConversions._
 
 object GitHubConnect {
-  val Token: String = "f9e373c8a9eaa74567fb2e124444e2648b7faa6e"
+  val Token: String = ""
   val organizationName: String = "WorkplaceXYZ"
 
-  def apply(client: GitHub,  mapper: ObjectMapper, publisher: GitHubPublisher): GitHubConnect = {
-    new GitHubConnect(client, mapper, publisher)
+  def apply(client: GitHub,  mapper: ObjectMapper, publisher: GitHubPublisher, kafkaProducer:KafkaProducer[String, Array[Byte]]): GitHubConnect = {
+    new GitHubConnect(client, mapper, publisher, kafkaProducer)
   }
 }
 
-class GitHubConnect(client: GitHub, mapper: ObjectMapper, publisher: GitHubPublisher) {
+class GitHubConnect(client: GitHub, mapper: ObjectMapper, publisher: GitHubPublisher, kafkaProducer:KafkaProducer[String, Array[Byte]]) {
     import GitHubConnect._
     val logger: Logger = LoggerFactory.getLogger("GitHubConnect")
 

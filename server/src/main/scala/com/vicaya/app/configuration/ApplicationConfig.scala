@@ -57,7 +57,7 @@ case class KafkaProducerConfiguration(
    @JsonProperty lingerMs: Long,
    @JsonProperty compressionType: String,
    @JsonProperty maxBlockMs: Long,
-   @JsonProperty config: Map[String, String]
+   @JsonProperty conf: Map[String, String]
 )
 
 /* Request / Response Formats */

@@ -69,12 +69,12 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     // Init Service class
-    val dropboxConnector: DropBoxConnect = DropBoxConnect(new DropBoxPublisher(esClient), mapper)
+    val dropboxConnector: DropBoxConnect = DropBoxConnect(new DropBoxPublisher(esClient), mapper, kafkaProducer)
     val client =  new BoxAPIConnection(BoxConnect.ClientId, BoxConnect.ClientSecret, BoxConnect.Token, null)
 
-    val boxConnector: BoxConnect = BoxConnect(httpClient, mapper, client, new BoxPublisher(esClient))
+    val boxConnector: BoxConnect = BoxConnect(httpClient, mapper, client, new BoxPublisher(esClient), kafkaProducer)
     val gitHubClient = new GitHubBuilder().withOAuthToken(GitHubConnect.Token).build
-    val gitHubConnector: GitHubConnect = GitHubConnect(gitHubClient, mapper, new GitHubPublisher(esClient))
+    val gitHubConnector: GitHubConnect = GitHubConnect(gitHubClient, mapper, new GitHubPublisher(esClient), kafkaProducer)
 
     env.jersey().register(new UserResource(new BaseDaoService(ctx)))
 //    env.jersey().register(new ServiceResource(new ConnectorService(
@@ -166,6 +166,8 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
     val producer = new KafkaProducer[String, Array[Byte]](props)
     producer
   }
+
+  //def initAWSs3Client(conf: S3Client):
 
   private val APPLICATION_NAME = "Google Drive API Search Content"
   private val JSON_FACTORY = JacksonFactory.getDefaultInstance

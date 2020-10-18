@@ -6,11 +6,11 @@ server:
 
   applicationConnectors:
     - type: http
-      port: 8080
+      port: 9090
 
   adminConnectors:
     - type: http
-      port: 8081
+      port: 9091
 
 logging:
   level: INFO
@@ -96,7 +96,7 @@ databaseConfig:
   # Location of the sql file to execute
   sqlFileLocation: "/Users/rgupta/Development/PERSONAL/workspace-crawler/server/src/main/resources/db/V1_Initial_Schema_Create.sql"
 
-kafkaProducerConfig:
+kafkaProducerConfiguration:
   bootstrapServers: localhost:9092
   topic: "Vicayah.FileMetaData"
   acks: all
