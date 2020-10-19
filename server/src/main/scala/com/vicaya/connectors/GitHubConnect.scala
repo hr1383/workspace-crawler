@@ -5,19 +5,20 @@ import com.vicaya.elasticsearch.dao.GitHubPublisher
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.kohsuke.github.{GHRepository, GitHub}
 import org.slf4j.{Logger, LoggerFactory}
+import software.amazon.awssdk.services.s3.S3Client
 
 import scala.collection.JavaConversions._
 
 object GitHubConnect {
-  val Token: String = ""
+  val Token: String = "06c59910441ccd36480eeb037e2ef6972e98f782"
   val organizationName: String = "WorkplaceXYZ"
 
-  def apply(client: GitHub,  mapper: ObjectMapper, publisher: GitHubPublisher, kafkaProducer:KafkaProducer[String, Array[Byte]]): GitHubConnect = {
-    new GitHubConnect(client, mapper, publisher, kafkaProducer)
+  def apply(client: GitHub,  mapper: ObjectMapper, publisher: GitHubPublisher, kafkaProducer:KafkaProducer[String, Array[Byte]], s3Client:S3Client): GitHubConnect = {
+    new GitHubConnect(client, mapper, publisher, kafkaProducer, s3Client)
   }
 }
 
-class GitHubConnect(client: GitHub, mapper: ObjectMapper, publisher: GitHubPublisher, kafkaProducer:KafkaProducer[String, Array[Byte]]) {
+class GitHubConnect(client: GitHub, mapper: ObjectMapper, publisher: GitHubPublisher, kafkaProducer:KafkaProducer[String, Array[Byte]], s3Client:S3Client) {
     import GitHubConnect._
     val logger: Logger = LoggerFactory.getLogger("GitHubConnect")
 

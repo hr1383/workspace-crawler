@@ -39,6 +39,9 @@ import org.apache.http.impl.nio.client.HttpAsyncClientBuilder
 import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSerializer}
 import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
 import org.kohsuke.github.GitHubBuilder
+import software.amazon.awssdk.auth.credentials.InstanceProfileCredentialsProvider
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.s3.S3Client
 
 import scala.util.{Failure, Success, Try}
 
@@ -62,6 +65,9 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
     // Init Kafka
     val kafkaProducer:KafkaProducer[String, Array[Byte]] = initKafkaProducer(conf.kafkaProducerConfiguration)
 
+    // Init AWS S3
+    val s3client: S3Client = initAWSs3Client()
+
     // Init resource class
     val httpClient = asyncHttpClient()
     val mapper = new ObjectMapper()
@@ -69,12 +75,12 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     // Init Service class
-    val dropboxConnector: DropBoxConnect = DropBoxConnect(new DropBoxPublisher(esClient), mapper, kafkaProducer)
+    val dropboxConnector: DropBoxConnect = DropBoxConnect(new DropBoxPublisher(esClient), mapper, kafkaProducer, s3client)
     val client =  new BoxAPIConnection(BoxConnect.ClientId, BoxConnect.ClientSecret, BoxConnect.Token, null)
 
-    val boxConnector: BoxConnect = BoxConnect(httpClient, mapper, client, new BoxPublisher(esClient), kafkaProducer)
+    val boxConnector: BoxConnect = BoxConnect(httpClient, mapper, client, new BoxPublisher(esClient), kafkaProducer, s3client)
     val gitHubClient = new GitHubBuilder().withOAuthToken(GitHubConnect.Token).build
-    val gitHubConnector: GitHubConnect = GitHubConnect(gitHubClient, mapper, new GitHubPublisher(esClient), kafkaProducer)
+    val gitHubConnector: GitHubConnect = GitHubConnect(gitHubClient, mapper, new GitHubPublisher(esClient), kafkaProducer, s3client)
 
     env.jersey().register(new UserResource(new BaseDaoService(ctx)))
 //    env.jersey().register(new ServiceResource(new ConnectorService(
@@ -167,7 +173,28 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
     producer
   }
 
-  //def initAWSs3Client(conf: S3Client):
+  def initAWSs3Client(): S3Client = {
+    val AWS_ACCESS_KEY_ID = "AKIAQHWYTFXZFI2OURNZ"
+    val SECRET_ACCESS_KEY = "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"
+    val region: Region = Region.US_WEST_2
+
+//    val provider: BasicCredentialsProvider = new BasicCredentialsProvider()
+//      provider.
+//      setCredentials(
+//        AuthScope.ANY,
+//        new UsernamePasswordCredentials(AWS_ACCESS_KEY_ID, SECRET_ACCESS_KEY)
+//      )
+
+    val s3Client:S3Client = S3Client.
+      builder().
+      credentialsProvider(
+        InstanceProfileCredentialsProvider.
+          builder().
+          build()).
+      region(region).
+      build()
+    s3Client
+  }
 
   private val APPLICATION_NAME = "Google Drive API Search Content"
   private val JSON_FACTORY = JacksonFactory.getDefaultInstance

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.vicaya.elasticsearch.dao.DropBoxPublisher
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.{Logger, LoggerFactory}
+import software.amazon.awssdk.services.s3.S3Client
 
 import scala.collection.JavaConverters._
 
@@ -61,16 +62,16 @@ object DropBoxConnect {
       .start().getMatches.asScala
   }
 
-  def apply(publisher: DropBoxPublisher, mapper: ObjectMapper,kafkaProducer:KafkaProducer[String, Array[Byte]]): DropBoxConnect = {
-    new DropBoxConnect(init(), mapper, publisher, kafkaProducer)
+  def apply(publisher: DropBoxPublisher, mapper: ObjectMapper,kafkaProducer:KafkaProducer[String, Array[Byte]], s3Client:S3Client): DropBoxConnect = {
+    new DropBoxConnect(init(), mapper, publisher, kafkaProducer,s3Client)
   }
 
-  def apply(client: DbxClientV2, mapper: ObjectMapper, publisher: DropBoxPublisher,kafkaProducer:KafkaProducer[String, Array[Byte]]): DropBoxConnect = {
-    new DropBoxConnect(client, mapper, publisher, kafkaProducer)
+  def apply(client: DbxClientV2, mapper: ObjectMapper, publisher: DropBoxPublisher,kafkaProducer:KafkaProducer[String, Array[Byte]], s3Client:S3Client): DropBoxConnect = {
+    new DropBoxConnect(client, mapper, publisher, kafkaProducer, s3Client)
   }
 }
 
-class DropBoxConnect(client: DbxClientV2, mapper: ObjectMapper, publisher: DropBoxPublisher, kafkaProducer:KafkaProducer[String, Array[Byte]]) {
+class DropBoxConnect(client: DbxClientV2, mapper: ObjectMapper, publisher: DropBoxPublisher, kafkaProducer:KafkaProducer[String, Array[Byte]], s3Client:S3Client) {
   val logger: Logger = LoggerFactory.getLogger("DropBoxConnect")
 
   def crawlFiles(client: DbxClientV2, path: String = "", list : Seq[Metadata]): Seq[DBMetadata] = {

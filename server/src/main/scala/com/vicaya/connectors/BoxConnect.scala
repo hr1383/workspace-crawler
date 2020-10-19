@@ -1,9 +1,10 @@
 package com.vicaya.connectors
 
 
+import java.io.FileInputStream
 import java.sql.Timestamp
 
-import com.box.sdk.{BoxAPIConnection, BoxFile, BoxFolder, BoxItem}
+import com.box.sdk.{BoxAPIConnection, BoxFile, BoxFolder, BoxItem, ProgressListener}
 import com.fasterxml.jackson.annotation.{JsonFormat, JsonProperty}
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.vicaya.app.response.{ConnectorEnum, Document}
@@ -13,8 +14,10 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConversions._
 import io.circe.generic.auto._
-import io.circe.syntax._
 import org.apache.kafka.clients.producer.KafkaProducer
+import software.amazon.awssdk.core.sync.RequestBody
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.PutObjectRequest
 
 import scala.util.{Failure, Success, Try}
 
@@ -22,14 +25,15 @@ object BoxConnect {
   val Token: String = "6ctmkWASysN1a2328zpA6mZ1RXkZxxZ6"
   val ClientId: String = "lpncbi12x6tsxt3uw5o9w46o60c2tuba"
   val ClientSecret: String = "4BOnTTM2hDfi9jWtpLkwQnCmO0nYE5Vr"
+  val BUCKET_NAME: String = "com.vicayah.internal.dev.files.backup"
 
-  def apply(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxAPIConnection, publisher: BoxPublisher, kafkaProducer:KafkaProducer[String, Array[Byte]]): BoxConnect = {
-    new BoxConnect(httpClient, mapper, client, publisher, kafkaProducer)
+  def apply(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxAPIConnection, publisher: BoxPublisher, kafkaProducer:KafkaProducer[String, Array[Byte]], s3Client:S3Client): BoxConnect = {
+    new BoxConnect(httpClient, mapper, client, publisher, kafkaProducer, s3Client)
   }
 }
 
 
-class BoxConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxAPIConnection, publisher: BoxPublisher, kafkaProducer:KafkaProducer[String, Array[Byte]]) extends SearchConnect {
+class BoxConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxAPIConnection, publisher: BoxPublisher, kafkaProducer:KafkaProducer[String, Array[Byte]], s3Client:S3Client) extends SearchConnect {
   val logger: Logger = LoggerFactory.getLogger("BoxConnect")
 
   val PARENT_URL = "https://api.box.com/2.0/search"
@@ -95,9 +99,26 @@ class BoxConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxA
        val file: BoxFile = new BoxFile(client, meta.getID)
        val info: BoxFile#Info = file.getInfo()
        val stream = new FileOutputStream(info.getName)
-       file.download(stream)
+       file.download(stream, new ProgressListener {
+         override def onProgressChanged(l: Long, l1: Long): Unit = {
+           logger.info(s"Downloading ${info.getName} PercentageDownloaded: ${(l/l1) * 100}")
+           if (l >= l1) {
+             logger.info(s"Download complete and can be used as a signal to upload")
+             // Upload to s3
+             s3Client.putObject(
+               PutObjectRequest.
+                 builder().
+                 bucket(BoxConnect.BUCKET_NAME).
+                 key("BOX").
+                 build(),
+               RequestBody.fromInputStream(new FileInputStream(info.getName), 8192)
+             )
+           }
+         }
+       })
        // once downloaded publish to kafka
        //kafkaProducer.send()
+
      } match {
         case Success(value) =>
             logger.info(s"Successfully downloaded file $value")
