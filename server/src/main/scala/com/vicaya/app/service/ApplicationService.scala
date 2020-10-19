@@ -174,8 +174,8 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
   }
 
   def initAWSs3Client(): S3Client = {
-    val AWS_ACCESS_KEY_ID = "AKIAQHWYTFXZFI2OURNZ"
-    val SECRET_ACCESS_KEY = "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"
+    val AWS_ACCESS_KEY_ID = ""
+    val SECRET_ACCESS_KEY = ""
     val region: Region = Region.US_WEST_2
 
 //    val provider: BasicCredentialsProvider = new BasicCredentialsProvider()
