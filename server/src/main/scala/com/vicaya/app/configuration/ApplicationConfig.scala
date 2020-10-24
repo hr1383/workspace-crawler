@@ -16,6 +16,8 @@ case class WorkSpaceCrawlerConfiguration(
 case class ElasticSearchConfig(
   @JsonProperty @Min(100) @Max(30000) connectionTtlMs : Int = 5000,
   @JsonProperty maxConnTotal: Int = 20,
+  @JsonProperty hostname: String = "localhost",
+  @JsonProperty port: Int = 9200,
   @NotNull @NotEmpty @JsonProperty("url") url: String
 )
 

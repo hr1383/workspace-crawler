@@ -42,6 +42,7 @@ import org.kohsuke.github.GitHubBuilder
 import software.amazon.awssdk.auth.credentials.InstanceProfileCredentialsProvider
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
+import com.box.sdk.BoxTransactionalAPIConnection
 
 import scala.util.{Failure, Success, Try}
 
@@ -60,7 +61,7 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
   override def run(conf: WorkSpaceCrawlerConfiguration, env: Environment): Unit = {
 
     val ctx: PostgresJdbcContext[SnakeCase] with ImplicitQuery = dbConnect(conf)
-    val esClient: RestHighLevelClient = initElasticsearch()
+    val esClient: RestHighLevelClient = initElasticsearch(conf)
 
     // Init Kafka
     val kafkaProducer:KafkaProducer[String, Array[Byte]] = initKafkaProducer(conf.kafkaProducerConfiguration)
@@ -76,7 +77,8 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
 
     // Init Service class
     val dropboxConnector: DropBoxConnect = DropBoxConnect(new DropBoxPublisher(esClient), mapper, kafkaProducer, s3client)
-    val client =  new BoxAPIConnection(BoxConnect.ClientId, BoxConnect.ClientSecret, BoxConnect.Token, null)
+    val api = new BoxTransactionalAPIConnection(BoxConnect.primaryToken)
+    val client =  new BoxAPIConnection(api.getClientID, api.getClientSecret, api.getAccessToken, api.getRefreshToken)
 
     val boxConnector: BoxConnect = BoxConnect(httpClient, mapper, client, new BoxPublisher(esClient), kafkaProducer, s3client)
     val gitHubClient = new GitHubBuilder().withOAuthToken(GitHubConnect.Token).build
@@ -139,14 +141,14 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
     statement.execute(VicayaUtils.readFileContent(fileLocation))
   }
 
-  def initElasticsearch(): RestHighLevelClient = {
+  def initElasticsearch(conf: WorkSpaceCrawlerConfiguration): RestHighLevelClient = {
 
     val credentialsProvider = new BasicCredentialsProvider()
     credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("enterprise_search", "pcDrxUHDBPafJOcPf3BZ"))
 
     val client: RestHighLevelClient = new RestHighLevelClient(
       RestClient.builder(
-        new HttpHost("localhost", 9200, "http"))
+        new HttpHost(conf.elasticSearchConfig.hostname, conf.elasticSearchConfig.port, "http"))
         .setHttpClientConfigCallback(new HttpClientConfigCallback() {
           override def customizeHttpClient(httpAsyncClientBuilder: HttpAsyncClientBuilder): HttpAsyncClientBuilder = {
              httpAsyncClientBuilder.setDefaultCredentialsProvider(credentialsProvider)

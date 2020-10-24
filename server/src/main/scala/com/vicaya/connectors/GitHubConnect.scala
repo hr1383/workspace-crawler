@@ -10,7 +10,7 @@ import software.amazon.awssdk.services.s3.S3Client
 import scala.collection.JavaConversions._
 
 object GitHubConnect {
-  val Token: String = "06c59910441ccd36480eeb037e2ef6972e98f782"
+  val Token: String = "bcc6e6b48a33526a09e0cef1aafceb9e9e7ae1b3"
   val organizationName: String = "WorkplaceXYZ"
 
   def apply(client: GitHub,  mapper: ObjectMapper, publisher: GitHubPublisher, kafkaProducer:KafkaProducer[String, Array[Byte]], s3Client:S3Client): GitHubConnect = {

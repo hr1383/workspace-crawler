@@ -9,12 +9,13 @@ import com.fasterxml.jackson.annotation.{JsonFormat, JsonProperty}
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.vicaya.app.response.{ConnectorEnum, Document}
 import com.vicaya.elasticsearch.dao.BoxPublisher
+import com.vicaya.kafka.pojo.{KafkaFileMetadata, KafkaSerializer}
 import org.asynchttpclient.AsyncHttpClient
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConversions._
 import io.circe.generic.auto._
-import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
@@ -23,9 +24,14 @@ import scala.util.{Failure, Success, Try}
 
 object BoxConnect {
   val Token: String = "6ctmkWASysN1a2328zpA6mZ1RXkZxxZ6"
-  val ClientId: String = "lpncbi12x6tsxt3uw5o9w46o60c2tuba"
-  val ClientSecret: String = "4BOnTTM2hDfi9jWtpLkwQnCmO0nYE5Vr"
+  val ClientId: String = "0h1wqnr7mvlltifbvq3ve900ob8vnm86"
+  val primaryToken: String = "VqRLRH0ogjfWuUwexD0WE546wgPF7BEa"
+  val secondaryToken: String = "F8Mq6q5trIMsAKHTplq0lXZTZMmfFkjF"
   val BUCKET_NAME: String = "com.vicayah.internal.dev.files.backup"
+
+
+  // primary key: Ww65fizrPNeo4UA4chQIBHuny6dc3ULV
+  // Secondary Key: cWDqyWIBAbBQG5kCiamwrZb6eEZN49md
 
   def apply(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxAPIConnection, publisher: BoxPublisher, kafkaProducer:KafkaProducer[String, Array[Byte]], s3Client:S3Client): BoxConnect = {
     new BoxConnect(httpClient, mapper, client, publisher, kafkaProducer, s3Client)
@@ -74,6 +80,7 @@ class BoxConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxA
     val metas: Seq[BoxItem#Info] = startCrawler(rootFolder)
     if (metas != null && metas.nonEmpty) {
       logger.info(s"Crawling done.., Found ${metas.size} files to publish to ES")
+      publish(metas)
       download(metas)
     }
     true
@@ -98,14 +105,15 @@ class BoxConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxA
      val download = Try {
        val file: BoxFile = new BoxFile(client, meta.getID)
        val info: BoxFile#Info = file.getInfo()
-       val stream = new FileOutputStream(info.getName)
-       file.download(stream, new ProgressListener {
+       val loc: String = s"/Users/rgupta/Development/vicaya/downloads/${info.getName}"
+       val stream = new FileOutputStream(loc)
+         file.download(stream, new ProgressListener {
          override def onProgressChanged(l: Long, l1: Long): Unit = {
            logger.info(s"Downloading ${info.getName} PercentageDownloaded: ${(l/l1) * 100}")
            if (l >= l1) {
              logger.info(s"Download complete and can be used as a signal to upload")
              // Upload to s3
-             s3Client.putObject(
+             val s3Loc = s3Client.putObject(
                PutObjectRequest.
                  builder().
                  bucket(BoxConnect.BUCKET_NAME).
@@ -117,7 +125,23 @@ class BoxConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxA
          }
        })
        // once downloaded publish to kafka
-       //kafkaProducer.send()
+       kafkaProducer
+         .send(
+           new ProducerRecord[String, Array[Byte]](
+             "file-metadata",
+             meta.getID,
+             KafkaSerializer.serialise(KafkaFileMetadata(
+               id = meta.getID,
+               name = meta.getName,
+               doc_type = meta.getType,
+               size = meta.getSize,
+               s3_location = loc,
+               uuid = meta.getID,
+               source = "box",
+               last_modified = meta.getContentModifiedAt.toString
+             ))
+           )
+         )
 
      } match {
         case Success(value) =>

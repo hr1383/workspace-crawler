@@ -55,7 +55,9 @@ httpConfig:
 elasticSearch:
   maxConnTotal: 50
   connectionTtlMs: 30000
-  url: http://localhost:29200
+  hostname: localhost
+  port: 9200
+  url: http://localhost:9200
 
 databaseConfig:
   # Run Embedded mode
@@ -94,7 +96,7 @@ databaseConfig:
   checkConnectionWhileIdle: false
 
   # Location of the sql file to execute
-  sqlFileLocation: "/Users/rgupta/Development/PERSONAL/workspace-crawler/server/src/main/resources/db/V1_Initial_Schema_Create.sql"
+  sqlFileLocation: "/Users/rgupta/Development/vicaya/workspace-crawler/conf/db/V1_Initial_Schema_Create.sql"
 
 kafkaProducerConfiguration:
   bootstrapServers: localhost:9092
