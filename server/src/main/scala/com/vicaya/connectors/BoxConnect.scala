@@ -23,8 +23,9 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import scala.util.{Failure, Success, Try}
 
 object BoxConnect {
-  val Token: String = "6ctmkWASysN1a2328zpA6mZ1RXkZxxZ6"
-  val ClientId: String = "0h1wqnr7mvlltifbvq3ve900ob8vnm86"
+  val Token: String = "AnPzWSBRWaA6Br6KWH8xrV56g6ZtEXv4"
+  val ClientId: String = "t99zy30x5a9khx5rhrgz5s0watrl5uup"
+  val ClientSecret: String = "pIdZmsbhXosvWIng86rFnybmpDSDdGGW"
   val primaryToken: String = "VqRLRH0ogjfWuUwexD0WE546wgPF7BEa"
   val secondaryToken: String = "F8Mq6q5trIMsAKHTplq0lXZTZMmfFkjF"
   val BUCKET_NAME: String = "com.vicayah.internal.dev.files.backup"
@@ -113,19 +114,19 @@ class BoxConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxA
            if (l >= l1) {
              logger.info(s"Download complete and can be used as a signal to upload")
              // Upload to s3
-             val s3Loc = s3Client.putObject(
-               PutObjectRequest.
-                 builder().
-                 bucket(BoxConnect.BUCKET_NAME).
-                 key("BOX").
-                 build(),
-               RequestBody.fromInputStream(new FileInputStream(info.getName), 8192)
-             )
+//             val s3Loc = s3Client.putObject(
+//               PutObjectRequest.
+//                 builder().
+//                 bucket(BoxConnect.BUCKET_NAME).
+//                 key("BOX").
+//                 build(),
+//               RequestBody.fromInputStream(new FileInputStream(info.getName), 8192)
+//             )
            }
          }
        })
        // once downloaded publish to kafka
-       kafkaProducer
+       val metadata = kafkaProducer
          .send(
            new ProducerRecord[String, Array[Byte]](
              "file-metadata",
@@ -138,10 +139,11 @@ class BoxConnect(httpClient: AsyncHttpClient, mapper: ObjectMapper, client: BoxA
                s3_location = loc,
                uuid = meta.getID,
                source = "box",
-               last_modified = meta.getContentModifiedAt.toString
+               last_modified = null
              ))
            )
-         )
+         ).get()
+       logger.info(s"${metadata.partition()}")
 
      } match {
         case Success(value) =>

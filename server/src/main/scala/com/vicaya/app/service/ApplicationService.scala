@@ -78,7 +78,7 @@ object ApplicationService extends ScalaApplication[WorkSpaceCrawlerConfiguration
     // Init Service class
     val dropboxConnector: DropBoxConnect = DropBoxConnect(new DropBoxPublisher(esClient), mapper, kafkaProducer, s3client)
     val api = new BoxTransactionalAPIConnection(BoxConnect.primaryToken)
-    val client =  new BoxAPIConnection(api.getClientID, api.getClientSecret, api.getAccessToken, api.getRefreshToken)
+    val client =  new BoxAPIConnection(BoxConnect.ClientId, BoxConnect.ClientSecret, BoxConnect.Token, null)
 
     val boxConnector: BoxConnect = BoxConnect(httpClient, mapper, client, new BoxPublisher(esClient), kafkaProducer, s3client)
     val gitHubClient = new GitHubBuilder().withOAuthToken(GitHubConnect.Token).build
